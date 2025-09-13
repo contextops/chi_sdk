@@ -216,10 +216,17 @@ def _download_binary(target_dir: Path) -> bool:
             with zipfile.ZipFile(tmp_path, 'r') as z:
                 # Find chi-tui binary in the archive
                 for name in z.namelist():
-                    if name.endswith("chi-tui.exe") or name == "chi-tui":
-                        with z.open(name) as src, open(target, "wb") as dst:
-                            shutil.copyfileobj(src, dst)
-                        break
+                    # On Windows, look for .exe; on others, look for chi-tui without extension
+                    if os.name == "nt":
+                        if name.endswith("chi-tui.exe") or name == "chi-tui.exe":
+                            with z.open(name) as src, open(target, "wb") as dst:
+                                shutil.copyfileobj(src, dst)
+                            break
+                    else:
+                        if (name.endswith("chi-tui") and not name.endswith(".exe")) or name == "chi-tui":
+                            with z.open(name) as src, open(target, "wb") as dst:
+                                shutil.copyfileobj(src, dst)
+                            break
         elif asset_name.endswith(".tar.gz"):
             with tarfile.open(tmp_path, 'r:gz') as t:
                 # Find chi-tui binary in the archive
