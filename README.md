@@ -156,7 +156,7 @@ The generated YAML files include detailed comments explaining each option.
 
 #### TUI Binary Management
 
-The TUI is a separate Rust binary that can be:
+The TUI is a separate Rust binary ([source code](https://github.com/contextops/chi_tui)) that can be:
 
 ```bash
 # Downloaded automatically (recommended)
@@ -164,6 +164,12 @@ chi-admin ensure-chi --download
 
 # Or built from source if you have Rust installed
 chi-admin ensure-chi --compile
+
+# Build from GitHub source
+git clone https://github.com/contextops/chi_tui
+cd chi_tui
+cargo build --release
+cp target/release/chi-tui ~/.local/bin/
 ```
 
 #### Direct TUI launch
@@ -189,17 +195,29 @@ CHI_APP_BIN=my-app chi-tui
 
 ## Examples
 
-For a complete working example, check out the chi_tui repository which includes an example application demonstrating:
+For a complete working example, check out the [chi_tui repository](https://github.com/contextops/chi_tui) which includes an example application demonstrating:
 - Interactive forms and menus
 - Progress indicators
 - Multiple panel layouts
 - Custom styling
 
+You can run the example directly from the chi_tui repo:
+```bash
+git clone https://github.com/contextops/chi_tui
+cd chi_tui/example-app
+./example-app-wrapper ui
+```
+
+## Related Projects
+
+- **[chi_tui](https://github.com/contextops/chi_tui)** - The Rust TUI application that powers the interface
+- **[example-app](https://github.com/contextops/chi_tui/tree/main/example-app)** - Full-featured example application
+
 ## License
 
 Apache 2.0 - See [LICENSE](LICENSE) for details.
 
-The TUI binary (chi_tui) is licensed under AGPL 3.0.
+The TUI binary ([chi_tui](https://github.com/contextops/chi_tui)) is licensed under AGPL 3.0.
 
 ## Headless Smoke (CI-friendly)
 
