@@ -201,7 +201,15 @@ CHI_APP_BIN=my-app chi-tui
 - **Rust TUI** ([chi_tui](https://github.com/contextops/chi_tui)) - High-performance terminal interface
 - **Communication** - JSON-based protocol between Python and Rust
 
-## Examples
+## Documentation
+
+### TUI Configuration
+Complete guide for configuring the Terminal User Interface:
+- [TUI Configuration Guide](docs/tui-configuration/README.md) - How to configure menus, panels, and widgets
+- [Widget Documentation](docs/widgets/) - Detailed docs for each widget type
+- [Widget Schema Specification](docs/widgets_spec.md) - Complete YAML schema reference
+
+### Examples
 
 For a complete working example, check out the [chi_tui repository](https://github.com/contextops/chi_tui) which includes an example application demonstrating:
 - Interactive forms and menus
