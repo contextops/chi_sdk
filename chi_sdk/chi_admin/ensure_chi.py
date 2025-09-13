@@ -4,8 +4,11 @@ import os
 import platform
 import shutil
 import subprocess
+import tarfile
+import tempfile
 import urllib.error
 import urllib.request
+import zipfile
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -134,7 +137,7 @@ def _compile_from_sources(sources_dir: Path, target_dir: Path) -> bool:
 
 def _download_binary(target_dir: Path) -> bool:
     """Download chi-tui binary from GitHub releases."""
-    owner_repo = os.environ.get("CHI_TUI_GH_REPO", "contextops/chi_sdk")
+    owner_repo = os.environ.get("CHI_TUI_GH_REPO", "contextops/chi_tui")
     tag = os.environ.get("CHI_TUI_BIN_TAG")  # if not set, use latest
 
     def _fetch_json(url: str):
@@ -160,35 +163,76 @@ def _download_binary(target_dir: Path) -> bool:
     sysname = platform.system().lower()
     # mach = platform.machine().lower()
 
-    def _match_raw(asset_name: str) -> bool:
+    # Determine platform and architecture
+    machine = platform.machine().lower()
+    arch = "arm64" if machine in ("aarch64", "arm64") else "amd64"
+
+    def _match_asset(asset_name: str) -> bool:
         n = asset_name.lower()
         if not n.startswith("chi-tui"):
             return False
+
+        # Check for architecture match
+        if arch == "arm64" and "arm64" not in n and "aarch64" not in n:
+            return False
+        if arch == "amd64" and "arm64" not in n and "aarch64" not in n:
+            # For amd64, we want assets without arm64
+            pass
+
+        # Check for OS match
         if sysname == "windows":
-            return n.endswith(".exe") and ("windows" in n or "win" in n)
+            return ("windows" in n or "win" in n) and n.endswith(".zip")
         if sysname == "darwin":
-            return ("macos" in n) or ("darwin" in n)
-        return "linux" in n
+            return ("macos" in n or "darwin" in n) and n.endswith(".tar.gz")
+        # Linux
+        return "linux" in n and n.endswith(".tar.gz")
 
     # Find matching asset
-    raw = next((a for a in assets if _match_raw(a.get("name", ""))), None)
-    if not raw:
+    asset = next((a for a in assets if _match_asset(a.get("name", ""))), None)
+    if not asset:
         return False
 
-    url = raw.get("browser_download_url")
+    url = asset.get("browser_download_url")
     if not url:
         return False
 
     # Create target directory
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    # Download binary
+    # Download and extract binary
     binary_name = "chi-tui.exe" if os.name == "nt" else "chi-tui"
     target = target_dir / binary_name
 
     try:
-        with urllib.request.urlopen(url, timeout=60) as resp, open(target, "wb") as dst:
-            shutil.copyfileobj(resp, dst)
+        # Download to temporary file
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            with urllib.request.urlopen(url, timeout=60) as resp:
+                shutil.copyfileobj(resp, tmp_file)
+            tmp_path = tmp_file.name
+
+        # Extract based on file type
+        asset_name = asset.get("name", "").lower()
+        if asset_name.endswith(".zip"):
+            with zipfile.ZipFile(tmp_path, 'r') as z:
+                # Find chi-tui binary in the archive
+                for name in z.namelist():
+                    if name.endswith("chi-tui.exe") or name == "chi-tui":
+                        with z.open(name) as src, open(target, "wb") as dst:
+                            shutil.copyfileobj(src, dst)
+                        break
+        elif asset_name.endswith(".tar.gz"):
+            with tarfile.open(tmp_path, 'r:gz') as t:
+                # Find chi-tui binary in the archive
+                for member in t.getmembers():
+                    if member.name.endswith("chi-tui") or member.name == "chi-tui":
+                        with t.extractfile(member) as src, open(target, "wb") as dst:
+                            shutil.copyfileobj(src, dst)
+                        break
+
+        # Clean up temp file
+        os.unlink(tmp_path)
+
+        # Make executable
         _ensure_executable(target)
         return True
     except Exception:
