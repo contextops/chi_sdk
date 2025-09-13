@@ -62,5 +62,9 @@ CLAUDE.md
 GEMINI.md
 
 # Precompiled binaries
+chi_sdk/bin/chi-tui
+chi_sdk/bin/chi-tui.exe
 example-apps/example-app/.tui/bin/chi-tui
 example-apps/example-app/.tui/bin/chi-tui.exe
+**/.tui/bin/chi-tui
+**/.tui/bin/chi-tui.exe

@@ -18,8 +18,12 @@ pip install chi-sdk
 
 This installs:
 - The Python SDK for building commands
-- Pre-built TUI binary (downloaded on first use)
-- `chi-admin` tool for configuration
+- `chi-admin` tool for configuration and TUI management
+
+The TUI binary will be downloaded automatically on first use, or you can get it manually:
+```bash
+chi-admin ensure-chi --download
+```
 
 ## Features
 
@@ -156,21 +160,25 @@ The generated YAML files include detailed comments explaining each option.
 
 #### TUI Binary Management
 
-The TUI is a separate Rust binary ([source code](https://github.com/contextops/chi_tui)) that can be:
+The TUI is a separate Rust binary ([source code](https://github.com/contextops/chi_tui)) that needs to be installed. It's NOT included in the Python package to keep it lightweight.
+
+Installation options:
 
 ```bash
-# Downloaded automatically (recommended)
+# Option 1: Download prebuilt binary (recommended)
 chi-admin ensure-chi --download
 
-# Or built from source if you have Rust installed
+# Option 2: Build from source if you have Rust installed
 chi-admin ensure-chi --compile
 
-# Build from GitHub source
+# Option 3: Build directly from GitHub
 git clone https://github.com/contextops/chi_tui
 cd chi_tui
 cargo build --release
 cp target/release/chi-tui ~/.local/bin/
 ```
+
+The binary is downloaded/built to `~/.local/bin/chi-tui` by default.
 
 #### Direct TUI launch
 
