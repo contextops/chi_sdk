@@ -2,19 +2,33 @@
 
 Build beautiful Terminal User Interfaces for your Python CLI applications without rewriting your code.
 
+## What is CHI SDK?
+
+CHI SDK is a Python framework that lets you create CLI applications that can run in two modes:
+- **CLI mode** - Traditional command-line interface
+- **TUI mode** - Rich Terminal User Interface with forms, menus, and visualizations
+
+The TUI is powered by a separate Rust application ([chi_tui](https://github.com/contextops/chi_tui)) that communicates with your Python code via JSON protocol. You write Python, users get a beautiful interface.
+
 ## Installation
 
 ```bash
 pip install chi-sdk
 ```
 
+This installs:
+- The Python SDK for building commands
+- Pre-built TUI binary (downloaded on first use)
+- `chi-admin` tool for configuration
+
 ## Features
 
 - 🎯 **Decorator-based** - Add TUI capabilities with simple decorators
 - 🔒 **Type-safe** - Pydantic models for input/output validation
-- 🚀 **Fast** - High-performance TUI included (no additional downloads)
-- 📦 **Batteries included** - Works out of the box
+- 🚀 **Fast** - High-performance Rust TUI (separate binary)
+- 📦 **Zero configuration** - Works out of the box
 - 🔄 **Dual-mode** - Same code works as CLI and TUI
+- 🎨 **Customizable** - YAML-based UI configuration
 
 ## Quick Example
 
@@ -57,17 +71,25 @@ if __name__ == "__main__":
 
 ### As a CLI
 ```bash
+# Traditional command-line interface
 todo-app add-todo --task "Write documentation" --priority 5
 ```
 
 ### As a TUI
 ```bash
-# Just add 'ui' - it's automatic!
+# Launch the Terminal User Interface
 todo-app ui
+
+# The TUI provides:
+# - Interactive forms for command inputs
+# - Real-time output visualization
+# - Navigation between commands
+# - Progress indicators for long-running tasks
 ```
 
 ### With JSON output (for scripting)
 ```bash
+# Machine-readable output for automation
 todo-app --json add-todo --task "Write documentation" --priority 5
 ```
 
@@ -95,14 +117,24 @@ Use `emit_ok()`, `emit_error()`, and `emit_progress()` to send structured respon
 - `emit_error()` - Emit an error response
 - `emit_progress()` - Emit progress updates for long-running tasks
 
+### How the TUI Works
+
+When you run `my-app ui`, the following happens:
+
+1. **TUI Binary Launch** - The Rust-based TUI application starts
+2. **Command Discovery** - TUI calls your Python app with `--chi-expose-bundle` to discover available commands
+3. **User Interaction** - TUI presents forms and menus based on your command schemas
+4. **Command Execution** - When user submits a form, TUI calls your Python app with the command and arguments
+5. **Result Display** - TUI beautifully renders the output from your Python code
+
 ### Utilities
 
 #### Automatic `ui` subcommand
 
-Every CLI built with CHI SDK automatically gets a `ui` subcommand:
+Every CLI built with CHI SDK automatically gets a `ui` subcommand that launches the TUI:
 
 ```bash
-my-app ui  # Launches the TUI
+my-app ui  # Launches the Terminal User Interface
 ```
 
 #### `chi-admin` - TUI Configuration & Tools
@@ -111,48 +143,63 @@ my-app ui  # Launches the TUI
 # Generate TUI configuration files with examples
 chi-admin init . --binary-name=my-app
 # Creates:
-#   .tui/chi-index.yaml - Navigation entry (menu)
-#   .tui/panel_b.yaml   - Panel configuration
+#   .tui/chi-index.yaml - Command menu structure
+#   .tui/panel_b.yaml   - Panel layouts
 #   .tui/styles.yaml    - Visual customization
-#   .tui/bin/my-app-ui - Standalone launcher
+#   .tui/bin/my-app-ui - Standalone launcher script
 
 # Check if everything is set up correctly
 chi-admin doctor
 ```
 
-The generated YAML files include detailed comments to help you customize your TUI.
+The generated YAML files include detailed comments explaining each option.
 
-#### Ensure TUI binary (`chi-tui`)
+#### TUI Binary Management
+
+The TUI is a separate Rust binary that can be:
 
 ```bash
-# Build from local Rust sources
-chi-admin ensure-chi --compile
-
-# Or download a prebuilt binary
+# Downloaded automatically (recommended)
 chi-admin ensure-chi --download
+
+# Or built from source if you have Rust installed
+chi-admin ensure-chi --compile
 ```
 
-#### `chi-tui` - Direct TUI launcher
+#### Direct TUI launch
 
 ```bash
+# Launch TUI directly (useful for debugging)
 CHI_APP_BIN=my-app chi-tui
 ```
 
+## Architecture
+
+```
+┌─────────────────┐         JSON Protocol          ┌──────────────┐
+│   Python App    │ ◄──────────────────────────► │   Rust TUI   │
+│   (chi-sdk)     │         Commands/Results       │  (chi_tui)   │
+└─────────────────┘                                └──────────────┘
+       Your Code                                    Separate Binary
+```
+
+- **Python SDK** (this repo) - Decorators, models, and CLI builder
+- **Rust TUI** ([chi_tui](https://github.com/contextops/chi_tui)) - High-performance terminal interface
+- **Communication** - JSON-based protocol between Python and Rust
+
 ## Examples
 
-See the [example-apps](../example-apps/) directory for complete working examples:
-
-- `example-app` - Interactive reference implementation with:
-  - F1-F6 navigation for different feature categories
-  - Comprehensive widget demos (lists, forms, panels, progress)
-  - Built-in documentation and guides
-  - Copy-paste ready patterns for your own apps
+For a complete working example, check out the chi_tui repository which includes an example application demonstrating:
+- Interactive forms and menus
+- Progress indicators
+- Multiple panel layouts
+- Custom styling
 
 ## License
 
 Apache 2.0 - See [LICENSE](LICENSE) for details.
 
-The included TUI binary has its own license (AGPL 3.0).
+The TUI binary (chi_tui) is licensed under AGPL 3.0.
 
 ## Headless Smoke (CI-friendly)
 
