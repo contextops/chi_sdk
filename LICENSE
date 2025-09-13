@@ -1,0 +1,24 @@
+# CHI-TUI Licensing
+
+This project uses dual licensing:
+
+## Python SDK (`python-chi-sdk/`)
+Licensed under Apache License 2.0 - see LICENSE-APACHE
+
+## Rust TUI Binary (`rust-tui/` and compiled `chi-tui` binary)
+Licensed under GNU Affero General Public License v3.0 - see LICENSE-AGPL
+
+## Summary
+
+- **Python SDK**: Apache 2.0 (permissive) - You can use it in closed-source projects
+- **TUI Binary**: AGPL-3.0 (copyleft) - If you distribute it, you must share source code
+
+For commercial licensing of the TUI binary (to avoid AGPL requirements), please contact the maintainers.
+
+## Installation
+
+When you install `chi-sdk` via pip, you receive both components:
+- The SDK code (Apache 2.0)
+- The precompiled TUI binary (AGPL-3.0)
+
+By using the TUI binary, you agree to comply with the AGPL-3.0 license terms.

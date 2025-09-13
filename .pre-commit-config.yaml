@@ -1,0 +1,26 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+  - repo: local
+    hooks:
+      - id: check-file-line-count
+        name: Check Python files are <= 600 lines
+        entry: python scripts/check_max_lines.py --max-lines 600
+        language: system
+        pass_filenames: true
+        files: ^(src/|tests/).+\.py$
+        stages: [commit]
+      - id: pytest
+        name: Run pytest
+        entry: pytest -q
+        language: system
+        pass_filenames: false
+        stages: [commit]

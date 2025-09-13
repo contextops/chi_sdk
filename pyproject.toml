@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chi-sdk"
+version = "0.0.5"
+description = "Build beautiful Terminal UIs for Python CLIs without rewriting your code"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "click>=8",
+  "pydantic>=2",
+]
+authors = [{name = "CHI TUI", email = "devnull@example.com"}]
+license = {text = "Apache-2.0 for SDK, AGPL-3.0 for TUI binary (see LICENSE files)"}
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+homepage = "https://github.com/contextops/chi_sdk"
+repository = "https://github.com/contextops/chi_sdk"
+
+[project.scripts]
+chi-admin = "chi_sdk.admin:main"
+chi-tui = "chi_sdk.tui_runner.runner:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+chi_sdk = ["bin/*"]
+
+[project.optional-dependencies]
+dev = [
+  "pre-commit>=3.6",
+  "black>=24.3",
+  "ruff>=0.4",
+  "pytest>=7",
+]

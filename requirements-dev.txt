@@ -1,0 +1,8 @@
+black
+ruff
+pytest
+mypy
+types-setuptools
+pydantic>=2
+click>=8
+pre-commit
