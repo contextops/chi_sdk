@@ -153,9 +153,13 @@ def _download_binary(target_dir: Path) -> bool:
                 f"https://api.github.com/repos/{owner_repo}/releases/tags/{tag}"
             )
         else:
-            rel = _fetch_json(
-                f"https://api.github.com/repos/{owner_repo}/releases/latest"
+            # Get all releases (including pre-releases) and pick the first one
+            releases = _fetch_json(
+                f"https://api.github.com/repos/{owner_repo}/releases"
             )
+            if not releases:
+                return False
+            rel = releases[0]  # GitHub returns them sorted by created_at desc
     except Exception:
         return False
 
