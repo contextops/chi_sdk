@@ -7,8 +7,8 @@ class BinaryDistribution(Distribution):
         # Mark wheel as platform-specific when binary is included
         import os
 
-        binary_exists = os.path.exists("src/chi_sdk/bin/chi-tui") or os.path.exists(
-            "src/chi_sdk/bin/chi-tui.exe"
+        binary_exists = os.path.exists("chi_sdk/bin/chi-tui") or os.path.exists(
+            "chi_sdk/bin/chi-tui.exe"
         )
         return binary_exists
 
